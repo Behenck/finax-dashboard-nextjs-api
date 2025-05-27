@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DatePickerWithRange } from './components/date-range-picker'
 import { CardTop } from './_general/cards/card-top'
@@ -12,11 +12,7 @@ import {
   RotateCcw,
   XCircle,
 } from 'lucide-react'
-import {
-  CommissionsResponse,
-  getSalesData,
-  SalesResponse,
-} from './components/action'
+import { CommissionsResponse, getSales, SalesResponse } from '@/http/get-sales'
 
 export default function Home() {
   const [vendas, setVendas] = useState<SalesResponse | null>(null)
@@ -34,7 +30,8 @@ export default function Home() {
     (vendas?.finalizado?.quantidade ?? 0) -
     (vendas?.cancelados?.quantidade ?? 0)
   const totalReceitasFuturas =
-    (comissoes?.finalizado?.valor ?? 0) - (comissoes?.processando?.valor ?? 0)
+    (comissoes?.finalizado?.valor ?? 0) + (comissoes?.processando?.valor ?? 0)
+
   const handleDateClose = async ({
     initialDate,
     finalDate,
@@ -49,7 +46,7 @@ export default function Home() {
 
     setIsLoading(true)
     try {
-      const data = await getSalesData({ initialDate, finalDate })
+      const data = await getSales({ initialDate, finalDate })
       setVendas(data.vendas)
       setComissoes(data.comissoes)
     } catch (err) {
@@ -60,6 +57,18 @@ export default function Home() {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    const now = new Date()
+    const initialDate = new Date(now.getFullYear(), 0, 1)
+    initialDate.setHours(0, 0, 0, 0)
+    const finalDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    finalDate.setHours(23, 59, 59, 999)
+    handleDateClose({
+      initialDate: initialDate.toISOString(),
+      finalDate: finalDate.toISOString(),
+    })
+  }, [])
 
   return (
     <main className="flex flex-col min-h-screen max-2xl p-4 gap-4">
@@ -86,7 +95,6 @@ export default function Home() {
         </TabsList>
 
         <TabsContent value="general">
-          {/* container que recebe blur quando isLoading=true */}
           <div
             className={`flex gap-4 transition-all ${
               isLoading ? 'filter blur-sm pointer-events-none' : ''

@@ -5,7 +5,26 @@ interface getSalesRequest {
   finalDate: string
 }
 
-export async function getSales({ initialDate, finalDate }: getSalesRequest) {
+export interface SalesResponse {
+  finalizado: { valor: number; quantidade: number }
+  processando: { valor: number; quantidade: number }
+  cancelados: { valor: number; quantidade: number }
+}
+export interface CommissionsResponse {
+  finalizado: { valor: number; quantidade: number }
+  processando: { valor: number; quantidade: number }
+  estorno: { valor: number }
+}
+
+interface ResponseData {
+  vendas: SalesResponse
+  comissoes: CommissionsResponse
+}
+
+export async function getSales({
+  initialDate,
+  finalDate,
+}: getSalesRequest): Promise<ResponseData> {
   const query = new URLSearchParams({
     data_inicio: initialDate,
     data_fim: finalDate,
