@@ -5,31 +5,65 @@ interface getSalesRequest {
   finalDate: string
 }
 
-export interface SalesResponse {
-  finalizado: { valor: number; quantidade: number }
-  processando: { valor: number; quantidade: number }
-  cancelados: { valor: number; quantidade: number }
-}
-export interface CommissionsResponse {
-  finalizado: { valor: number; quantidade: number }
-  processando: { valor: number; quantidade: number }
-  estorno: { valor: number }
+interface statusMetrics {
+  amount: number
+  count?: number
 }
 
-interface ResponseData {
-  vendas: SalesResponse
-  comissoes: CommissionsResponse
+export interface SalesMetrics {
+  completed: statusMetrics
+  pending: statusMetrics
+  cancelled: statusMetrics
+}
+
+export interface IncomeMetrics {
+  completed: statusMetrics
+  pending: statusMetrics
+  refunded: statusMetrics
+}
+
+export interface Metrics {
+  sales: SalesMetrics
+  income: IncomeMetrics
 }
 
 export async function getSales({
   initialDate,
   finalDate,
-}: getSalesRequest): Promise<ResponseData> {
+}: getSalesRequest): Promise<Metrics> {
   const query = new URLSearchParams({
     data_inicio: initialDate,
     data_fim: finalDate,
   }).toString()
 
-  const res = await api.get(`/api_dashboard_busca_vendas/?${query}`)
-  return res.data
+  const { data } = await api.get(`/api_dashboard_busca_vendas/?${query}`)
+
+  const sales: SalesMetrics = {
+    completed: {
+      amount: data.vendas.finalizado.valor,
+      count: data.vendas.finalizado.quantidade,
+    },
+    pending: {
+      amount: data.vendas.processando.valor,
+      count: data.vendas.processando.quantidade,
+    },
+    cancelled: {
+      amount: data.vendas.cancelados.valor,
+      count: data.vendas.cancelados.quantidade,
+    },
+  }
+
+  const income: IncomeMetrics = {
+    completed: {
+      amount: data.comissoes.finalizado.valor,
+    },
+    pending: {
+      amount: data.comissoes.processando.valor,
+    },
+    refunded: {
+      amount: data.comissoes.estorno.valor,
+    },
+  }
+
+  return { sales, income }
 }

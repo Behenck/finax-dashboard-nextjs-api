@@ -35,15 +35,15 @@ export function CardTop({
   totalQuantity = 0,
 }: CardTopProps) {
   return (
-    <Card className="flex flex-col gap-2 flex-1">
-      <CardHeader className="flex items-center justify-between">
-        <div className="flex flex-col">
+    <Card className="flex flex-col gap-2 flex-1 justify-between">
+      <CardHeader className="flex flex-col">
+        <div className="flex items-center justify-between w-full">
           <CardTitle className="text-lg">{title}</CardTitle>
-          <CardDescription className="text-xs">{description}</CardDescription>
+          <div>{icon}</div>
         </div>
-        <div>{icon}</div>
+        <CardDescription className="text-xs">{description}</CardDescription>
       </CardHeader>
-      <CardContent className=" flex flex-col gap-1">
+      <CardContent className="flex flex-col gap-1">
         {items.map((item) => (
           <div
             className="flex items-center justify-between"
@@ -67,24 +67,27 @@ export function CardTop({
           </div>
         ))}
       </CardContent>
-      {total > 0 && (
-        <CardFooter className="flex flex-col gap-4">
-          <Separator />
-          <div className="flex items-center justify-between w-full">
-            <p className="text-lg font-bold">Total</p>
-            <div>
-              <p className="text-lg font-bold text-foreground">
-                {formatAmount(total)}
-              </p>
-              {totalQuantity > 0 && (
-                <p className="text-muted-foreground text-right text-xs">
-                  {totalQuantity} {items[0].quantityLabel || 'vendas'}
+
+      <CardFooter className="flex flex-col gap-4">
+        {total > 0 && (
+          <>
+            <Separator />
+            <div className="flex items-center justify-between w-full">
+              <p className="text-lg font-bold">Total</p>
+              <div>
+                <p className="text-lg font-bold text-foreground">
+                  {formatAmount(total)}
                 </p>
-              )}
+                {totalQuantity > 0 && (
+                  <p className="text-muted-foreground text-right text-xs">
+                    {totalQuantity} {items[0].quantityLabel || 'vendas'}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        </CardFooter>
-      )}
+          </>
+        )}
+      </CardFooter>
     </Card>
   )
 }
