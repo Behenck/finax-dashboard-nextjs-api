@@ -36,7 +36,7 @@ export default function Home() {
           {isLoading && <SummarySkeleton />}
           {error && (
             <>
-              <p className="text-right text-muted-foreground mr-4">{error}</p>
+              <p className="text-right text-red-700 mr-4">{error.message}</p>
               <SummarySkeleton />
             </>
           )}
