@@ -34,6 +34,7 @@ export default function Home() {
 
         <TabsContent value="general">
           {isLoading && <SummarySkeleton />}
+          {error && <SummarySkeleton />}
           {!isLoading && !error && (
             <>
               <p className="text-right text-muted-foreground mr-4">
