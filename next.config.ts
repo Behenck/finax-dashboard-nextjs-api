@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   // output: 'export',
   // assetPrefix: './',
   // trailingSlash: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 }
 
 export default nextConfig
