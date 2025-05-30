@@ -1,5 +1,4 @@
 import type { NextConfig } from 'next'
-import TerserPlugin from 'terser-webpack-plugin'
 
 const nextConfig: NextConfig = {
   // output: 'export',
@@ -8,21 +7,12 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // desativa o minificador SWC
-  swcMinify: false,
-  webpack(config, { dev }) {
-    if (!dev) {
-      // força o Terser a rodar em um único processo
-      config.optimization.minimizer = [
-        new TerserPlugin({
-          parallel: false,
-          terserOptions: {
-            format: { comments: false },
-          },
-        }),
-      ]
-    }
-    return config
+  experimental: {
+    // força o Next a NÃO usar Worker Threads (usa processos em vez disso)
+    workerThreads: false,
+    // quantos “processos filhos” (workers) o Next pode criar em paralelo
+    // ajuste para um valor abaixo do limite do seu servidor (ex: 2 ou 3)
+    cpus: 2,
   },
 }
 
