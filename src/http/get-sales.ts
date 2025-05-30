@@ -5,32 +5,34 @@ interface getSalesRequest {
   finalDate: string
 }
 
-interface statusMetrics {
+interface statusSummary {
   amount: number
   count?: number
+  details?: []
+  outcome?: number
 }
 
-export interface SalesMetrics {
-  completed: statusMetrics
-  pending: statusMetrics
-  cancelled: statusMetrics
+export interface SalesSummary {
+  completed: statusSummary
+  pending: statusSummary
+  cancelled: statusSummary
 }
 
-export interface IncomeMetrics {
-  completed: statusMetrics
-  pending: statusMetrics
-  refunded: statusMetrics
+export interface CommissionSummary {
+  completed: statusSummary
+  pending: statusSummary
+  refunded: statusSummary
 }
 
-export interface Metrics {
-  sales: SalesMetrics
-  income: IncomeMetrics
+export interface Summary {
+  sales: SalesSummary
+  commission: CommissionSummary
 }
 
 export async function getSales({
   initialDate,
   finalDate,
-}: getSalesRequest): Promise<Metrics> {
+}: getSalesRequest): Promise<Summary> {
   const query = new URLSearchParams({
     data_inicio: initialDate,
     data_fim: finalDate,
@@ -38,7 +40,7 @@ export async function getSales({
 
   const { data } = await api.get(`/api_dashboard_busca_vendas/?${query}`)
 
-  const sales: SalesMetrics = {
+  const sales: SalesSummary = {
     completed: {
       amount: data.vendas.finalizado.valor,
       count: data.vendas.finalizado.quantidade,
@@ -53,9 +55,11 @@ export async function getSales({
     },
   }
 
-  const income: IncomeMetrics = {
+  const commission: CommissionSummary = {
     completed: {
       amount: data.comissoes.finalizado.valor,
+      details: data.comissoes.finalizado.detalhes,
+      outcome: data.comissoes.finalizado.saida,
     },
     pending: {
       amount: data.comissoes.processando.valor,
@@ -65,5 +69,5 @@ export async function getSales({
     },
   }
 
-  return { sales, income }
+  return { sales, commission }
 }
